@@ -25,7 +25,7 @@ public class DataSetLoader {
         {
             String line = linReader.nextLine();
             if(false == StringUtils.isEmpty(line))
-            	radixtree.insert(line);
+            	radixtree.insert(line.toLowerCase());
             //System.out.println(line);
         }
         System.out.println("Dataset loaded.");

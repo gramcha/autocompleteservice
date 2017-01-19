@@ -10,7 +10,8 @@ import java.util.Set;
 
 public class Trie {
 
-	  String currentStr="root";
+	  String token="root";
+	  String completeToken;
 	  Trie parent=null;
 	  private Map<String, Trie> children = new HashMap<String, Trie>();
 	  boolean completeNode = false;
@@ -20,7 +21,7 @@ public class Trie {
 	    final int prime = 31;
 	    int result = 1;
 	    result = prime * result + ((children == null) ? 0 : children.hashCode());
-	    result = prime * result + ((currentStr == null) ? 0 : currentStr.hashCode());
+	    result = prime * result + ((token == null) ? 0 : token.hashCode());
 	    return result;
 	  }
 	  @Override
@@ -37,91 +38,14 @@ public class Trie {
 	        return false;
 	    } else if (!children.equals(other.children))
 	      return false;
-	    if (currentStr == null) {
-	      if (other.currentStr != null)
+	    if (token == null) {
+	      if (other.token != null)
 	        return false;
-	    } else if (!currentStr.equals(other.currentStr))
+	    } else if (!token.equals(other.token))
 	      return false;
 	    return true;
 	  }
-	  private Trie getLastNode(String input,int currentpos, int length)
-	  { 
-	    //System.out.println(input+" currentpos "+ currentpos +" length "+input.length());
-	    String key = input;
-	    if(currentpos==1 && input.length()>0)
-	      {
-	      //System.out.println("%%%");
-	      key = input.substring(0,currentpos);
-	      }
-	    else if(currentpos-1<input.length()&&currentpos>0)
-	      key = input.substring(0,currentpos-1);
-	    /*else
-	      return this;*/
-	    //System.out.println("key "+key);
-	    Trie result = children.get(key);
-	    if(result!=null /*&& currentpos-1<=length*/) {      
-	      //result = result.getLastNode(key,currentpos+1,length);
-	      result = result.getLastNode(key,currentpos,currentpos+1);
-	    }
-	    //System.out.println("returning last element "+result);
-	    if(result==null)
-	      return this;
-	    else
-	      return result;
-	  }
-	  public void insert(String input,int currentpos, int length)
-	  {
-	    //System.out.println("cpos = "+currentpos+" length = "+length);
-	    Trie prevPar=null;
-	    Trie lastChild=null;
-	    for(int i=currentpos;i<=length;i++) {
-	      
-	    if(i+1<length)
-	    {
-	      Trie child = null;
-	      String key = input.substring(0,i+1);      
-	      Trie parent =null; 
-	      parent = getLastNode(key,i+1,length);
-	      //System.out.println("**parent** "+parent);
-	      boolean spl =false;
-	        if (prevPar != null) {
-	          //System.out.println("####");
-	          parent = prevPar.getLastNode(key, i + 1, length);
-	        } else {
-	          //System.out.println("$$$$");
-	        }
-	      //System.out.println("**after parent** "+parent);
-	      //System.out.println("this "+this);
-	      //System.out.println("inserting "+key);
-	      if(parent!=this || i==currentpos) {
-	        child = new Trie();
-	        child.currentStr=key;
-	        child.parent=parent;
-	        parent.children.put(key, child);
-	        //System.out.println("after insert "+parent);
-	        lastChild = child;
-	      }
-	      prevPar = parent;
-	    }
-	    else if(i+1==length)
-	    {
-	      Trie child = new Trie();
-	      String key = input;
-	      //System.out.println("@@@inserting "+key);
-	      //System.out.println("this "+this);
-	      Trie parent = getLastNode(key,0,length);
-	      child.currentStr=key;
-	      //System.out.println("parent "+parent);
-	      //System.out.println("lastchild "+lastChild);
-	      lastChild.children.put(key, child);
-	    }
-	    //System.out.println("for loop "+i);
-	    }
-	    /*else*/
-	    {
-	      //System.out.println("reached end "+this);
-	    }
-	  }
+	  
 	  Trie findNode(Trie current, String key,int cpos)
 	  {
 	    Trie parent = null;
@@ -139,7 +63,7 @@ public class Trie {
 	      else
 	        tempkey = key.substring(0, i);
 	      //System.out.println(i+" search key "+tempkey);
-	      if(current.currentStr.equals(tempkey))
+	      if(current.token.equals(tempkey))
 	      {
 	        if(key.equals(tempkey))
 	        {
@@ -172,72 +96,71 @@ public class Trie {
 	    //System.out.println("returning null");
 	    return null;
 	  }
-	  public Trie insert(String key)
+	  public Trie insert(String input)
 	  {
 	    //Check key is already available
 	    Trie head = this;
-	    Trie result = findNode(head,key,0);
+	    Trie result = findNode(head,input,0);
 	    if(result!=null)
 	    {
 	      //System.out.println("Already in system "+ result);
 	      return result; 
 	    }
 	    else
-	    {
-	      int length = key.length();
-	      Trie current = head;
-	      String tempkey;
-	      for(int i=0;i<=length;i++)
-	      {
-	        if(i==0)
-	        {
-	          tempkey = key.substring(0, 1);
-	        }
-	        else
-	          tempkey = key.substring(0, i);
-	        Trie tempnode = findNode(current,tempkey,0); 
-	        if(tempnode==null)
-	        {
-	          tempnode = new Trie();
-	          tempnode.currentStr = tempkey;
-	          tempnode.parent = current;
-	          current.children.put(tempkey, tempnode);
-	          current = tempnode;
-	        }
-	        else
-	        {
-	          current = tempnode;
-	        }
-	      }
-	      current.completeNode=true;
-	      //System.out.println("Initial head "+head);
-	      //System.out.println("final current "+current);
-	      //findNode(Trie current, String key,int cpos)
-	    }
+		{	
+			String[] spiltedList = input.split(" ");
+			for (String token : spiltedList) {
+				int length = token.length();
+				Trie current = head;
+				String tempkey;
+				for (int i = 0; i <= length; i++) {
+					if (i == 0) {
+						tempkey = token.substring(0, 1);
+					} else
+						tempkey = token.substring(0, i);
+					Trie tempnode = findNode(current, tempkey, 0);
+					if (tempnode == null) {
+						tempnode = new Trie();
+						tempnode.token = tempkey;
+						tempnode.completeToken = input;
+						tempnode.parent = current;
+						current.children.put(tempkey, tempnode);
+						current = tempnode;
+					} else {
+						current = tempnode;
+					}
+				}
+				current.completeNode = true;
+			}
+
+			// System.out.println("Initial head "+head);
+			// System.out.println("final current "+current);
+			// findNode(Trie current, String key,int cpos)
+		}
 	    return null;
 	  }
 	  public static Trie create()
 	  {
 	    Trie tree = new Trie();
 	    Trie child = new Trie();
-	    child.currentStr="t";
+	    child.token="t";
 	    child.parent=tree;
-	    tree.children.put(child.currentStr, child);
+	    tree.children.put(child.token, child);
 	    Trie child2 = new Trie();
-	    child2.currentStr="te";
+	    child2.token="te";
 	    child2.parent=child;
-	    child.children.put(child2.currentStr, child2);
+	    child.children.put(child2.token, child2);
 	    Trie child3 = new Trie();
-	    child3.currentStr="tea";
+	    child3.token="tea";
 	    child3.completeNode=true;
 	    child3.parent=child2;
-	    child2.children.put(child3.currentStr, child3);
+	    child2.children.put(child3.token, child3);
 	    return tree;
 	  }
 	  @Override
 	  public String toString() {
 	    StringBuilder builder = new StringBuilder();
-	    builder.append(currentStr);
+	    builder.append(token);
 	    
 	    builder.append(" [terminal= ");
 	    builder.append(completeNode);
@@ -254,7 +177,8 @@ public class Trie {
 	    protected Collection<String> allMatchingResults() {
 	        List<String> results = new ArrayList<String>();
 	        if (this.completeNode) {
-	            results.add(this.currentStr);
+	            //results.add(this.token);
+	            results.add(this.completeToken);
 	        }
 	        for (Entry<String, Trie> entry : children.entrySet()) {
 	        	//System.out.println("entry "+entry.getKey());
@@ -278,11 +202,11 @@ public class Trie {
 			System.out.println("results " + result);
 			return response;
 	    }
-	    /*
+	    
 	  public static void main(String[] args) {
 	    // TODO Auto-generated method stub
 
-	    Trie tree = new Trie();
+	    /*Trie tree = new Trie();
 	    String value ="tea";
 	    tree.insert(value, 0, value.length());
 	    //System.out.println("tree "+tree.toString());
@@ -301,7 +225,15 @@ public class Trie {
 	    Trie result1 = result.findNode(result,"t",0);
 	    System.out.println(result1);
 	    //System.out.println("size "+ObjectSizeFetcher.getObjectSize(result));
-	    System.out.println(result1.allMatchingResults().toString());
+	    System.out.println(result1.allMatchingResults().toString());*/
+		  
+		  Trie tree = new Trie();
+		  tree.insert("ganesh kumar");
+		  tree.insert("kumari");
+		  tree.insert("kumar");
+		  tree.insert("kumara");
+		  Trie result = tree.findNode(tree, "kumar", 0);
+		  System.out.println(result.allMatchingResults().toString());
 	  }
-*/
+
 }
