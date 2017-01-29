@@ -14,6 +14,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @SpringBootApplication
 public class AutoCompleteService extends SpringBootServletInitializer implements AsyncConfigurer {
 
+	public AutoCompleteService()
+	{
+		super();
+		setRegisterErrorPageFilter(false); // <- this one
+	}
+	
+	
 	  static {
 	    System.setProperty("org.apache.cxf.stax.allowInsecureParser", "true");
 	  }
